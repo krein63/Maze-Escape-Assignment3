@@ -24,8 +24,40 @@ public class DisjointSetTest {
         check(d.count() == 3, "3 sets: {0,1,2,3} {4} {5}");
         check(d.find(4) == 4 && d.find(5) == 5, "a single cell is its own root");
 
-        // TODO: add your own checks here
+        check(!d.union(2, 2), "union with itself returns false");
+        check(d.count() == 3, "self-union does not change count");
+        d.union(4, 5);
+        d.union(0, 4);
+        check(d.count() == 1, "all six cells form one set");
+        check(!d.union(5, 2) && d.count() == 1, "repeated union keeps one set");
+
+        DisjointSet bySize = new DisjointSet(5);
+        bySize.union(0, 1);
+        bySize.union(0, 2);
+        bySize.union(3, 4);
+        int largerRoot = bySize.find(0);
+        bySize.union(3, 0);
+        check(bySize.find(3) == largerRoot, "smaller set attaches to larger set");
+
+        DisjointSet single = new DisjointSet(1);
+        check(single.count() == 1 && single.find(0) == 0, "one cell is one set");
+        check(!single.union(0, 0), "single cell cannot be joined to itself again");
+        check(new DisjointSet(0).count() == 0, "empty DSU has zero sets");
+
+        int n = 100_000;
+        DisjointSet chain = new DisjointSet(n);
+        boolean allJoined = true;
+        for (int i = 1; i < n; i++) allJoined &= chain.union(i - 1, i);
+        check(allJoined && chain.count() == 1, "99,999 successful unions leave one set");
+        check(chain.connected(0, n - 1), "ends of a large chain are connected");
+        boolean sameRoot = true;
+        int root = chain.find(0);
+        for (int i = 0; i < n; i++) sameRoot &= chain.find(i) == root;
+        check(sameRoot, "every cell of a large chain has the same root");
+        check(!chain.union(n - 1, 0) && chain.count() == 1,
+                "joining a large set again leaves its count unchanged");
 
         System.out.println(failed == 0 ? "All checks passed." : failed + " checks failed.");
+        if (failed != 0) throw new AssertionError(failed + " DSU checks failed");
     }
 }
