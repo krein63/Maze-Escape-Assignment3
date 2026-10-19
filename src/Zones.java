@@ -86,7 +86,57 @@ public class Zones {
      * [1] the cost of the cheapest route from the zone of cell 0 to the zone of the last cell.
      */
     public static long[] routes(Input.Slides s, int[] zoneOf, int zoneCount) {
-        // TODO
-        return new long[]{0, 0};
+        if (zoneCount == 0) return new long[]{0, 0};
+
+        // Store each inter-zone slide in the list of its source zone.
+        int[] firstSlide = new int[zoneCount];
+        int[] nextSlide = new int[s.count()];
+        Arrays.fill(firstSlide, -1);
+        for (int slide = 0; slide < s.count(); slide++) {
+            int from = zoneOf[s.from()[slide]];
+            int to = zoneOf[s.to()[slide]];
+            if (from != to) {
+                nextSlide[slide] = firstSlide[from];
+                firstSlide[from] = slide;
+            }
+        }
+
+        int[] chain = new int[zoneCount];
+        Arrays.fill(chain, 1); // A chain may start in any zone.
+        long[] distance = new long[zoneCount];
+        Arrays.fill(distance, Long.MAX_VALUE);
+        distance[zoneOf[0]] = 0;
+
+        int[] targets = new int[zoneCount];
+        int[] bestCost = new int[zoneCount];
+        int[] markedBy = new int[zoneCount];
+        Arrays.fill(markedBy, -1);
+        int flowStages = 1;
+
+        for (int zone = 0; zone < zoneCount; zone++) {
+            int targetCount = 0;
+            // Keep one edge per target, with the cheapest slide's cost.
+            for (int slide = firstSlide[zone]; slide != -1; slide = nextSlide[slide]) {
+                int to = zoneOf[s.to()[slide]];
+                if (markedBy[to] != zone) {
+                    markedBy[to] = zone;
+                    targets[targetCount++] = to;
+                    bestCost[to] = s.time()[slide];
+                } else {
+                    bestCost[to] = Math.min(bestCost[to], s.time()[slide]);
+                }
+            }
+
+            // Every edge goes to a later zone in this topological order.
+            flowStages = Math.max(flowStages, chain[zone]);
+            for (int i = 0; i < targetCount; i++) {
+                int to = targets[i];
+                chain[to] = Math.max(chain[to], chain[zone] + 1);
+                if (distance[zone] != Long.MAX_VALUE) {
+                    distance[to] = Math.min(distance[to], distance[zone] + bestCost[to]);
+                }
+            }
+        }
+        return new long[]{flowStages, distance[zoneOf[s.n() - 1]]};
     }
 }
