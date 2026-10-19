@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 /**
  * Missions 4 and 5. The slides: a directed graph. Cells are 0 .. n-1, slide i goes from s.from()[i] to s.to()[i]
  * and takes s.time()[i]. There are no slides from a cell to itself, and the exit can always be reached from the start.
@@ -19,8 +21,62 @@ public class Zones {
      * Is DAG in Main is 1 when the number of zones equals the number of cells (no cycle), so you do not need a separate check.
      */
     public static int[] kosaraju(Input.Slides s) {
-        // TODO
-        return new int[s.n()];
+        int n = s.n();
+        int[][] forward = Graphs.slidesFrom(s);
+        int[][] reversed = Graphs.slidesInto(s);
+        boolean[] seen = new boolean[n];
+        int[] stack = new int[n];
+        int[] nextSlide = new int[n];
+        int[] finished = new int[n];
+        int finishCount = 0;
+
+        // First pass: finish a cell only after all its outgoing slides.
+        for (int start = 0; start < n; start++) {
+            if (seen[start]) continue;
+            int top = 0;
+            stack[top] = start;
+            nextSlide[top] = 0;
+            seen[start] = true;
+            while (top >= 0) {
+                int cell = stack[top];
+                if (nextSlide[top] == forward[cell].length) {
+                    finished[finishCount++] = cell;
+                    top--;
+                } else {
+                    int slide = forward[cell][nextSlide[top]++];
+                    int next = s.to()[slide];
+                    if (!seen[next]) {
+                        seen[next] = true;
+                        stack[++top] = next;
+                        nextSlide[top] = 0;
+                    }
+                }
+            }
+        }
+
+        int[] zoneOf = new int[n];
+        Arrays.fill(zoneOf, -1);
+        int zones = 0;
+        // Second pass: reversed slides, from last finished to first.
+        for (int i = finishCount - 1; i >= 0; i--) {
+            int start = finished[i];
+            if (zoneOf[start] != -1) continue;
+            int top = 0;
+            stack[top] = start;
+            zoneOf[start] = zones;
+            while (top >= 0) {
+                int cell = stack[top--];
+                for (int slide : reversed[cell]) {
+                    int next = s.from()[slide];
+                    if (zoneOf[next] == -1) {
+                        zoneOf[next] = zones;
+                        stack[++top] = next;
+                    }
+                }
+            }
+            zones++;
+        }
+        return zoneOf;
     }
 
     /**
