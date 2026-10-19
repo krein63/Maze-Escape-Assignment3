@@ -1,0 +1,3 @@
+Stress maze: 999999 path cells, 1000000 visited
+Stress slides: 200000-cell chain and cycle
+AlgorithmChecks: 7286 checks passed
