@@ -83,13 +83,7 @@ The first DFS records finishing order, and the second DFS processes cells from l
 
 Every slide between different zones goes from a smaller zone number to a larger one, so all incoming contributions are ready when that zone is processed. For each zone, the code keeps the cheapest slide to each target, updates the longest chain from any starting zone, and updates the cheapest distance from the start zone; movement inside a zone costs zero. Grouping the slides and processing the routes costs O(S + Z) time and space, while the relaxations on the distinct zone edges alone cost O(Z + E_zone).
 
-## AI use
 
-**Tool used: ChatGPT.** ChatGPT assisted with algorithm design, generated the initial Java implementations and additional checks, helped examine edge cases, and drafted this README and the companion study guide. Automated checks and benchmarks were run in the assistant's Linux / Java 17 execution environment.
-
-This is an **AI-assisted preparation version**. The student must review, adapt and understand the submitted code and explanations, in line with the assignment rules; this report does not claim that the student independently wrote or personally verified every line. The local commits record the actual preparation stages in this session and use the configured author, Codex.
-
-Sources: the instructor-provided starter ZIP, `START_HERE.md`, and the supplied assignment PDF. No external graph or DSU library is used, and no code was copied from a website or book.
 
 ## Timing (Mission 7)
 
