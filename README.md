@@ -161,4 +161,4 @@ The package includes the prepared `main` branch and its local Git history. After
 
 Do not delete `.git` if you want to keep the included mission commits. If that hidden folder is lost when transferring files, the companion `maze-escape-history.bundle` can restore the repository with `git clone maze-escape-history.bundle maze-escape-restored`.
 
-Before submitting, check your ID/name/group, review and adapt the AI-assisted work, confirm the public repository opens without signing in, and paste its real link into Moodle before the deadline. The defense is five minutes: one mini task and two questions; the task assigns 50 points to the project and 50 to the defense.
+
